@@ -39,6 +39,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
             const SizedBox(
               height: 48.0,
+              width: 4,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
