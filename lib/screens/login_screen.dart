@@ -1,4 +1,5 @@
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat_starting_project/components/rounded_button.dart';
 
 import '/constants.dart';
@@ -11,6 +12,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  var auth = FirebaseAuth.instance;
+  String errorMessage = '';
+  bool errorOccurred = false, showSpinner = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
