@@ -14,20 +14,6 @@ class _ChatScreenState extends State<ChatScreen> {
   final _fireStore = FirebaseFirestore.instance;
   TextEditingController _messageTextController = TextEditingController();
 
-  // void getMessages() async{
-  //    var messages = await _fireStore.collection('messages').get();
-  //    for(var message in messages.docs){
-  //      print(message.data());
-  //    }
-  // }
-
-  void messageStream() {
-    _fireStore.collection('messages').snapshots().listen((event) {
-      for (var message in event.docs) {
-        print(message.data());
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +26,10 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
-                Navigator.pop(context);
+                if(Navigator.canPop(context)){
+                  Navigator.pop(context);
+                }
+
                 AuthService().signOut();
               }),
         ],
@@ -52,6 +41,7 @@ class _ChatScreenState extends State<ChatScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             MessageStreams(fireStore: _fireStore),
+
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -113,16 +103,14 @@ class MessageStreams extends StatelessWidget {
           for (var message in messages) {
             var messageText = message.get('text');
             var sender = message.get('sender');
-            Widget messageBubble =MessageBubble(
+            Widget messageBubble = MessageBubble(
               message: messageText,
               sender: sender,
-            );
+              isMe: AuthService().getCurrentUser!.email == sender,);
             messageBubbles.add(messageBubble);
           }
-          return Expanded(
-            child: ListView(
-              children: messageBubbles,
-            ),
+          return Column(
+            children: messageBubbles,
           );
         } else {
           return const Center(child: Text('Snapshot has no data'));
@@ -131,3 +119,4 @@ class MessageStreams extends StatelessWidget {
     );
   }
 }
+
