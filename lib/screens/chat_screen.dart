@@ -51,39 +51,7 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-<<<<<<< HEAD
-            StreamBuilder<QuerySnapshot>(
-              stream: _fireStore.collection('messages').snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Expanded(
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        backgroundColor: Colors.lightBlue,
-                      ),
-                    ),
-                  );
-                }
-                if (snapshot.hasData) {
-                  var messages = snapshot.data!.docs;
-                  List<Text> messageWidgets = [];
-                  for (var message in messages) {
-                    var messageText = message.get('text');
-                    var sender = message.get('sender');
-                    Text messageWidget = Text('$messageText from $sender');
-                    messageWidgets.add(messageWidget);
-                  }
-                  return Column(
-                    children: messageWidgets,
-                  );
-                } else {
-                  return const Center(child: Text('Snapshot has no data'));
-                }
-              },
-            ),
-=======
-            MessageStream(fireStore: _fireStore),
->>>>>>> b4c77ac (Reactive Programming)
+            MessageStreams(fireStore: _fireStore),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -97,19 +65,12 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   TextButton(
                     onPressed: () {
-<<<<<<< HEAD
-                      _fireStore.collection('message').add({
-=======
                       _fireStore.collection('messages').add({
->>>>>>> b4c77ac (Reactive Programming)
                         'date': DateTime.now().millisecondsSinceEpoch,
                         'text': _messageTextController.text,
                         'sender': AuthService().getCurrentUser!.email,
                       });
-<<<<<<< HEAD
-=======
                       _messageTextController.clear();
->>>>>>> b4c77ac (Reactive Programming)
                     },
                     child: const Icon(Icons.send,
                         size: 30, color: kSendButtonColor),
@@ -124,8 +85,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
-class MessageStream extends StatelessWidget {
-  const MessageStream({
+class MessageStreams extends StatelessWidget {
+  const MessageStreams({
     Key? key,
     required FirebaseFirestore fireStore,
   }) : _fireStore = fireStore, super(key: key);
@@ -152,8 +113,10 @@ class MessageStream extends StatelessWidget {
           for (var message in messages) {
             var messageText = message.get('text');
             var sender = message.get('sender');
-            Widget messageBubble =
-                MessageBubble(message: messageText, sender: sender);
+            Widget messageBubble =MessageBubble(
+              message: messageText,
+              sender: sender,
+            );
             messageBubbles.add(messageBubble);
           }
           return Expanded(
@@ -168,5 +131,3 @@ class MessageStream extends StatelessWidget {
     );
   }
 }
-
-
