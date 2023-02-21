@@ -20,11 +20,11 @@ class _ChatScreenState extends State<ChatScreen> {
   //    }
   // }
 
-  void messageStream (){
+  void messageStream() {
     _fireStore.collection('messages').snapshots().listen((event) {
-      for(var message in event.docs){
-             print(message.data());
-           }
+      for (var message in event.docs) {
+        print(message.data());
+      }
     });
   }
 
@@ -39,9 +39,8 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
-               // Navigator.pop(context);
-               // AuthService().signOut();
-                messageStream();
+                Navigator.pop(context);
+                AuthService().signOut();
               }),
         ],
         title: const Text('⚡ ️Chat'),
@@ -51,6 +50,35 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            StreamBuilder<QuerySnapshot>(
+              stream: _fireStore.collection('messages').snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        backgroundColor: Colors.lightBlue,
+                      ),
+                    ),
+                  );
+                }
+                if (snapshot.hasData) {
+                  var messages = snapshot.data!.docs;
+                  List<Text> messageWidgets = [];
+                  for (var message in messages) {
+                    var messageText = message.get('text');
+                    var sender = message.get('sender');
+                    Text messageWidget = Text('$messageText from $sender');
+                    messageWidgets.add(messageWidget);
+                  }
+                  return Column(
+                    children: messageWidgets,
+                  );
+                } else {
+                  return const Center(child: Text('Snapshot has no data'));
+                }
+              },
+            ),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -64,11 +92,11 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   TextButton(
                     onPressed: () {
-                   _fireStore.collection('message').add({
-                     'date' : DateTime.now().millisecondsSinceEpoch,
-                     'text' : _messageTextController.text,
-                     'sender': AuthService().getCurrentUser!.email,
-                   });
+                      _fireStore.collection('message').add({
+                        'date': DateTime.now().millisecondsSinceEpoch,
+                        'text': _messageTextController.text,
+                        'sender': AuthService().getCurrentUser!.email,
+                      });
                     },
                     child: const Icon(Icons.send,
                         size: 30, color: kSendButtonColor),
